@@ -1,0 +1,606 @@
+String htmlPage() {
+  String html = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAVABOT Controller</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .emergency-section {
+      max-width: 1200px;
+      margin: 0 auto 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .emergency-button {
+      padding: 20px;
+      border: none;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .emergency-stop {
+      background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+      color: white;
+      box-shadow: 0 8px 32px rgba(211, 47, 47, 0.5);
+      animation: pulse-red 2s infinite;
+    }
+
+    .emergency-stop:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 40px rgba(211, 47, 47, 0.7);
+    }
+
+    .emergency-reset {
+      background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+      color: white;
+    }
+
+    .emergency-reset:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h3 {
+      margin-bottom: 15px;
+      font-size: 18px;
+      text-align: center;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 10px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .button-grid button:nth-child(1) { grid-column: 2; }
+    .button-grid button:nth-child(2) { grid-column: 1; grid-row: 2; }
+    .button-grid button:nth-child(3) { grid-column: 2; grid-row: 2; }
+    .button-grid button:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .button-grid button:nth-child(5) { grid-column: 2; grid-row: 3; }
+
+    button {
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .auto-button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #f9ab00 0%, #fbbc04 100%);
+      margin-top: 15px;
+    }
+
+    .auto-button.active {
+      background: linear-gradient(135deg, #0f9d58 0%, #16c172 100%);
+      box-shadow: 0 0 20px rgba(15, 157, 88, 0.5);
+    }
+
+    .relay-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .relay-buttons button.on {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    }
+
+    .relay-buttons button.off {
+      background: linear-gradient(135deg, #e53935 0%, #e35d5b 100%);
+    }
+
+    .status-display {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    .status-display strong {
+      color: #a8e063;
+    }
+
+    .timer-display {
+      background: rgba(15, 157, 88, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 18px;
+      border: 2px solid #0f9d58;
+    }
+
+    .timer-display.inactive {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .position-timer {
+      background: rgba(251, 188, 4, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 16px;
+      border: 2px solid #fbbc04;
+    }
+
+    .position-timer.inactive {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .ir-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .ir-sensor {
+      padding: 12px;
+      background: #0f9d58;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .ir-sensor.blocked {
+      background: #d93025;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .scheduler-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .scheduler-input:focus {
+      outline: none;
+      border-color: #a8e063;
+    }
+
+    .schedule-button {
+      width: 100%;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 12px;
+    }
+
+    .mode-badge {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .mode-badge.manual {
+      background: #fbbc04;
+      color: #000;
+    }
+
+    .mode-badge.auto {
+      background: #0f9d58;
+      animation: pulse 2s infinite;
+    }
+
+    .mode-badge.emergency {
+      background: #d32f2f;
+      animation: pulse-red 1s infinite;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      
+      .emergency-section {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+
+  <script>
+    let currentMode = 'manual';
+    let emergencyActive = false;
+
+    // Update UV Timer
+    async function updateTimer() {
+      try {
+        const res = await fetch('/timer_status');
+        const data = await res.json();
+        const display = document.getElementById('timerDisplay');
+        const timerDiv = document.getElementById('timerDiv');
+        
+        if(data.active) {
+          timerDiv.className = 'timer-display';
+          display.innerHTML = '⏱️ UV Cycle: <strong>' + data.remaining + '</strong>';
+        } else {
+          timerDiv.className = 'timer-display inactive';
+          display.innerHTML = '💡 UV Cycle: <strong>Inactive</strong>';
+        }
+      } catch(e) {
+        console.error('Timer update failed:', e);
+      }
+    }
+
+    // Update Position Wait Timer
+    async function updatePositionTimer() {
+      try {
+        const res = await fetch('/position_status');
+        const data = await res.json();
+        const display = document.getElementById('positionDisplay');
+        const positionDiv = document.getElementById('positionDiv');
+        
+        if(data.waiting) {
+          positionDiv.className = 'position-timer';
+          display.innerHTML = '⏸️ Position Hold: <strong>' + data.remaining + '</strong>';
+        } else {
+          positionDiv.className = 'position-timer inactive';
+          display.innerHTML = '🚶 Status: <strong>Moving</strong>';
+        }
+      } catch(e) {
+        console.error('Position timer update failed:', e);
+      }
+    }
+
+    setInterval(updateTimer, 1000);
+    setInterval(updatePositionTimer, 1000);
+
+    // Update IR Sensor status
+    async function updateIR() {
+      try {
+        const res = await fetch('/ir_status');
+        const data = await res.json();
+        
+        document.getElementById('irFL').className = 'ir-sensor' + (data.frontLeft ? ' blocked' : '');
+        document.getElementById('irFR').className = 'ir-sensor' + (data.frontRight ? ' blocked' : '');
+        document.getElementById('irBL').className = 'ir-sensor' + (data.backLeft ? ' blocked' : '');
+        document.getElementById('irBR').className = 'ir-sensor' + (data.backRight ? ' blocked' : '');
+        
+        let status = 'All Clear ✓';
+        if(data.frontLeft || data.frontRight || data.backLeft || data.backRight) {
+          status = 'Obstacle Detected! ⚠️';
+        }
+        document.getElementById('irMainStatus').innerText = status;
+      } catch(e) {
+        console.error('IR update failed:', e);
+      }
+    }
+    setInterval(updateIR, 500);
+
+    // Emergency Stop
+    async function emergencyStop() {
+      if(!confirm('🚨 ACTIVATE EMERGENCY STOP?\n\nThis will:\n• Stop all motors immediately\n• Turn off all relays\n• Disable auto mode\n\nAre you sure?')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/emergency_stop');
+        const status = await res.text();
+        emergencyActive = true;
+        currentMode = 'emergency';
+        
+        const badge = document.getElementById('modeBadge');
+        badge.className = 'mode-badge emergency';
+        badge.innerText = 'EMERGENCY STOP';
+        
+        const autoBtn = document.getElementById('autoBtn');
+        autoBtn.disabled = true;
+        autoBtn.style.opacity = '0.5';
+        
+        alert('🚨 EMERGENCY STOP ACTIVATED!\n\nAll systems stopped.\nClick "Reset System" to resume operation.');
+      } catch(e) {
+        alert('❌ Emergency stop failed: ' + e.message);
+      }
+    }
+
+    // Reset Emergency
+    async function resetEmergency() {
+      try {
+        const res = await fetch('/reset_emergency');
+        const status = await res.text();
+        emergencyActive = false;
+        currentMode = 'manual';
+        
+        const badge = document.getElementById('modeBadge');
+        badge.className = 'mode-badge manual';
+        badge.innerText = 'MANUAL MODE';
+        
+        const autoBtn = document.getElementById('autoBtn');
+        autoBtn.disabled = false;
+        autoBtn.style.opacity = '1';
+        autoBtn.classList.remove('active');
+        autoBtn.innerText = '🎮 Auto Sterilization: OFF';
+        
+        alert('✓ System Reset Complete\nReady for operation');
+      } catch(e) {
+        alert('❌ Reset failed: ' + e.message);
+      }
+    }
+
+    // Toggle automatic mode
+    async function toggleAutoMode() {
+      if(emergencyActive) {
+        alert('⚠️ Cannot start auto mode\nEmergency stop is active. Reset first.');
+        return;
+      }
+      
+      try {
+        const res = await fetch('/toggle_auto');
+        const status = await res.text();
+        const btn = document.getElementById('autoBtn');
+        const badge = document.getElementById('modeBadge');
+        
+        if(status.includes('ON')) {
+          currentMode = 'auto';
+          btn.classList.add('active');
+          btn.innerText = '🤖 Auto Sterilization: ON';
+          badge.className = 'mode-badge auto';
+          badge.innerText = 'AUTO MODE';
+          alert('✓ Automatic Mode ON\n\n• 30-min UV sterilization cycle started\n• Robot stops 5 min when hitting walls\n• Auto-navigates after wait time\n• Relay 2 activates after completion\n• Use EMERGENCY STOP to halt immediately');
+        } else {
+          currentMode = 'manual';
+          btn.classList.remove('active');
+          btn.innerText = '🎮 Auto Sterilization: OFF';
+          badge.className = 'mode-badge manual';
+          badge.innerText = 'MANUAL MODE';
+          alert('✓ Manual Mode ON\nFull control - All relays manual');
+        }
+      } catch(e) {
+        alert('❌ Failed to toggle mode: ' + e.message);
+      }
+    }
+
+    // Movement controls
+    function sendCommand(cmd) {
+      if(emergencyActive && cmd !== 'stop') {
+        alert('⚠️ Emergency stop active!\nReset system first.');
+        return;
+      }
+      fetch('/' + cmd).catch(e => console.error('Command failed:', e));
+    }
+
+    // Schedule UV light
+    async function setSchedule() {
+      if(emergencyActive) {
+        alert('⚠️ Cannot schedule\nEmergency stop is active.');
+        return;
+      }
+      
+      const datetime = document.getElementById('datetime').value;
+      if (!datetime) {
+        alert('⚠️ Please select date and time');
+        return;
+      }
+      try {
+        const res = await fetch('/setSchedule?datetime=' + encodeURIComponent(datetime));
+        const msg = await res.text();
+        alert('✓ ' + msg);
+      } catch(e) {
+        alert('❌ Schedule failed: ' + e.message);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateTimer();
+      updatePositionTimer();
+      updateIR();
+    });
+  </script>
+</head>
+
+<body>
+  <div class="header">
+    <h1>🤖 LAVABOT Controller</h1>
+    <p>IoT-Based Automatic Lavatory Sanitation Device</p>
+    <span id="modeBadge" class="mode-badge manual">MANUAL MODE</span>
+  </div>
+
+  <!-- Emergency Controls -->
+  <div class="emergency-section">
+    <button class="emergency-button emergency-stop" onclick="emergencyStop()">
+      🚨 EMERGENCY STOP
+    </button>
+    <button class="emergency-button emergency-reset" onclick="resetEmergency()">
+      ✓ RESET SYSTEM
+    </button>
+  </div>
+
+  <div class="container">
+    <!-- Movement Control -->
+    <div class="card">
+      <h3>🎮 Movement Control</h3>
+      <div class="button-grid">
+        <button onclick="sendCommand('forward')">▲<br>Forward</button>
+        <button onclick="sendCommand('left')">◄<br>Left</button>
+        <button onclick="sendCommand('stop')">■<br>Stop</button>
+        <button onclick="sendCommand('right')">►<br>Right</button>
+        <button onclick="sendCommand('backward')">▼<br>Backward</button>
+      </div>
+      <div class="status-display">
+        Speed: <strong>Fixed (60%)</strong>
+      </div>
+      <button id="autoBtn" class="auto-button" onclick="toggleAutoMode()">
+        🎮 Auto Sterilization: OFF
+      </button>
+    </div>
+
+    <!-- UV Sterilization Timer -->
+    <div class="card">
+      <h3>⏱️ UV Sterilization Timer</h3>
+      <div id="timerDiv" class="timer-display inactive">
+        <span id="timerDisplay">💡 UV Cycle: <strong>Inactive</strong></span>
+      </div>
+      <div id="positionDiv" class="position-timer inactive">
+        <span id="positionDisplay">🚶 Status: <strong>Moving</strong></span>
+      </div>
+      <p style="margin-top: 15px; font-size: 13px; opacity: 0.8; text-align: center;">
+        ℹ️ Auto Mode: 30-min UV + 5-min position holds<br>
+        ℹ️ Relay 2 activates after UV completion
+      </p>
+    </div>
+
+    <!-- IR Collision Sensors -->
+    <div class="card">
+      <h3>🚧 Collision Detection</h3>
+      <div class="status-display" id="irMainStatus">All Clear ✓</div>
+      <div class="ir-grid">
+        <div id="irFL" class="ir-sensor">Front Left ↖</div>
+        <div id="irFR" class="ir-sensor">Front Right ↗</div>
+        <div id="irBL" class="ir-sensor">Back Left ↙</div>
+        <div id="irBR" class="ir-sensor">Back Right ↘</div>
+      </div>
+      <p style="margin-top: 15px; font-size: 13px; opacity: 0.8; text-align: center;">
+        ℹ️ AUTO mode: Stops 5 min when hitting walls<br>
+        ℹ️ MANUAL mode: Display only
+      </p>
+    </div>
+
+    <!-- UV Light Control -->
+    <div class="card">
+      <h3>💡 UV Light (Relay 1)</h3>
+      <div class="relay-buttons">
+        <button class="on" onclick="sendCommand('relay1_on')">ON</button>
+        <button class="off" onclick="sendCommand('relay1_off')">OFF</button>
+      </div>
+      <p style="margin-top: 15px; font-size: 12px; opacity: 0.8; text-align: center;">
+        Manual control (Auto mode overrides)
+      </p>
+    </div>
+
+    <!-- Relay 2 Control -->
+    <div class="card">
+      <h3>🔌 Relay 2</h3>
+      <div class="relay-buttons">
+        <button class="on" onclick="sendCommand('relay2_on')">ON</button>
+        <button class="off" onclick="sendCommand('relay2_off')">OFF</button>
+      </div>
+      <p style="margin-top: 15px; font-size: 12px; opacity: 0.8; text-align: center;">
+        Auto-activates after UV cycle
+      </p>
+    </div>
+
+    <!-- Scheduler -->
+    <div class="card">
+      <h3>⏰ Auto-Start Scheduler</h3>
+      <input type="datetime-local" id="datetime" class="scheduler-input">
+      <button class="schedule-button" onclick="setSchedule()">Set Schedule</button>
+      <p style="margin-top: 10px; font-size: 12px; opacity: 0.8; text-align: center;">
+        Auto mode will start at scheduled time
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>
+)rawliteral";
+  return html;
+}
